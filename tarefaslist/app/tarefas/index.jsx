@@ -11,16 +11,13 @@ import {
   View,
 } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  adicionarTarefa,
-  atualizarTarefa,
-  deletarTarefa,
-  getTarefas,
-} from "@/back4app";
+import { useRouter } from "expo-router";
+import { adicionarTarefa, atualizarTarefa, getTarefas } from "@/back4app";
 
 export default function TarefasPage() {
   const queryClient = useQueryClient();
-  const [descricao, setDescricao] = useState("");
+  const router = useRouter();
+  const [titulo, setTitulo] = useState("");
 
   const { data, isFetching } = useQuery({
     queryKey: ["tarefas"],
@@ -37,26 +34,18 @@ export default function TarefasPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tarefas"] }),
   });
 
-  const mutationDeletar = useMutation({
-    mutationFn: deletarTarefa,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tarefas"] }),
-  });
-
   const isLoading =
-    isFetching ||
-    mutationAdicionar.isPending ||
-    mutationAtualizar.isPending ||
-    mutationDeletar.isPending;
+    isFetching || mutationAdicionar.isPending || mutationAtualizar.isPending;
 
   async function handleAdicionarTarefaPress() {
-    if (descricao.trim() === "") {
-      Alert.alert("Descrição inválida", "Preencha a descrição da tarefa", [
+    if (titulo.trim() === "") {
+      Alert.alert("Título inválido", "Preencha o título da tarefa", [
         { text: "OK" },
       ]);
       return;
     }
-    mutationAdicionar.mutate({ descricao, concluida: false });
-    setDescricao("");
+    mutationAdicionar.mutate({ titulo, descricao: "", concluida: false });
+    setTitulo("");
   }
 
   function handleToggleConcluida(tarefa) {
@@ -66,30 +55,15 @@ export default function TarefasPage() {
     });
   }
 
-  function handleDeletar(objectId) {
-    Alert.alert(
-      "Excluir tarefa",
-      "Tem certeza que deseja excluir esta tarefa?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Excluir",
-          style: "destructive",
-          onPress: () => mutationDeletar.mutate(objectId),
-        },
-      ],
-    );
-  }
-
   return (
     <View style={styles.container}>
       {isLoading && <ActivityIndicator size="large" />}
 
       <TextInput
         style={styles.input}
-        placeholder="Descrição"
-        value={descricao}
-        onChangeText={setDescricao}
+        placeholder="Título"
+        value={titulo}
+        onChangeText={setTitulo}
       />
       <Button
         title="Adicionar Tarefa"
@@ -102,25 +76,25 @@ export default function TarefasPage() {
       <View style={styles.tasksContainer}>
         {data?.map((t) => (
           <View key={t.objectId} style={styles.taskRow}>
-            <Text
-              style={[styles.taskText, t.concluida && styles.strikethroughText]}
+            <TouchableOpacity
+              style={styles.taskTextContainer}
+              onPress={() => router.push(`/tarefas/${t.objectId}`)}
             >
-              {t.descricao}
-            </Text>
+              <Text
+                style={[
+                  styles.taskText,
+                  t.concluida && styles.strikethroughText,
+                ]}
+              >
+                {t.titulo || t.descricao}
+              </Text>
+            </TouchableOpacity>
 
             <Switch
               value={t.concluida ?? false}
               onValueChange={() => handleToggleConcluida(t)}
               disabled={mutationAtualizar.isPending}
             />
-
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => handleDeletar(t.objectId)}
-              disabled={mutationDeletar.isPending}
-            >
-              <Text style={styles.deleteButtonText}>✕</Text>
-            </TouchableOpacity>
           </View>
         ))}
       </View>
@@ -158,8 +132,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 8,
   },
-  taskText: {
+  taskTextContainer: {
     flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+  },
+  taskText: {
     fontSize: 15,
   },
   strikethroughText: {
@@ -167,16 +145,5 @@ const styles = StyleSheet.create({
     textDecorationStyle: "solid",
     textDecorationColor: "red",
     color: "gray",
-  },
-  deleteButton: {
-    backgroundColor: "#e53935",
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  deleteButtonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 14,
   },
 });
