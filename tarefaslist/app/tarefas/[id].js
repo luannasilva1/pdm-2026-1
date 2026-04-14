@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { atualizarTarefa, deletarTarefa, getTarefas } from "@/back4app";
+import { atualizarTarefa, deletarTarefa, getTarefas } from "@/api";
 
 export default function TarefaDetalhePage() {
   const { id } = useLocalSearchParams();
