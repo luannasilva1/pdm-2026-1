@@ -42,6 +42,7 @@ export default function TarefaDetalhePage() {
     mutationFn: atualizarTarefa,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tarefas"] });
+      queryClient.invalidateQueries({ queryKey: ["tarefa", id] });
       Alert.alert("Sucesso", "Tarefa atualizada com sucesso!", [{ text: "OK" }]);
     },
     onError: () => {

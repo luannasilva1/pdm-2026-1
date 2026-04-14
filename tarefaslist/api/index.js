@@ -1,18 +1,16 @@
 import axios from "axios";
 
-const urlBase = "https://parseapi.back4app.com/classes/Tarefa";
-const headers = {
-  "X-Parse-Application-Id": "Y7F65DorGXZOZUEBpnPL6nAn0sONX8joHmSlpkmu",
-  "X-Parse-JavaScript-Key": "uAOFQLNP2MsznUdrebMbuTTZ7K2eHvP2eQVKuI7T",
-};
-const headersJson = {
-  ...headers,
-  "Content-Type": "application/json",
-};
+const urlBase = "https://prog-aos-2026-dngr-hgbvs6noh.vercel.app";
+
 
 export async function getTarefas() {
   const response = await axios.get(urlBase, { headers });
-  return response.data.results;
+  return response.data;
+}
+
+export async function getTarefa(id) {
+  const response = await axios.get(`${urlBase}/${id}`);
+  return response.data;
 }
 
 export async function adicionarTarefa(novaTarefa) {
