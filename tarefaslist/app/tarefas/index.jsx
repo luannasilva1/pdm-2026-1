@@ -2,100 +2,83 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Button,
+  Pressable,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { adicionarTarefa, getTarefas } from "@/api";
 import { useRouter } from "expo-router";
-import { adicionarTarefa, atualizarTarefa, getTarefas } from "@/api";
 
 export default function TarefasPage() {
-  const queryClient = useQueryClient();
   const router = useRouter();
-  const [titulo, setTitulo] = useState("");
-
+  const queryClient = useQueryClient();
   const { data, isFetching } = useQuery({
     queryKey: ["tarefas"],
     queryFn: getTarefas,
   });
-
-  const mutationAdicionar = useMutation({
+  const mutation = useMutation({
     mutationFn: adicionarTarefa,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tarefas"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tarefas"] });
+    },
   });
-
-  const mutationAtualizar = useMutation({
-    mutationFn: atualizarTarefa,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tarefas"] }),
-  });
-
-  const isLoading =
-    isFetching || mutationAdicionar.isPending || mutationAtualizar.isPending;
+  const [descricao, setDescricao] = useState("");
 
   async function handleAdicionarTarefaPress() {
-    if (titulo.trim() === "") {
-      Alert.alert("Título inválido", "Preencha o título da tarefa", [
-        { text: "OK" },
+    if (descricao.trim() === "") {
+      Alert.alert("Descrição inválida", "Preencha a descrição da tarefa", [
+        { text: "OK", onPress: () => {} },
       ]);
       return;
     }
-    mutationAdicionar.mutate({ titulo, descricao: "", concluida: false });
-    setTitulo("");
-  }
-
-  function handleToggleConcluida(tarefa) {
-    mutationAtualizar.mutate({
-      objectId: tarefa.objectId,
-      dados: { concluida: !tarefa.concluida },
-    });
+    mutation.mutate({ descricao });
+    setDescricao("");
   }
 
   return (
     <View style={styles.container}>
-      {isLoading && <ActivityIndicator size="large" />}
+      {(isFetching || mutation.isPending) && (
+        <ActivityIndicator size="large" color="#534AB7" />
+      )}
 
-      <TextInput
-        style={styles.input}
-        placeholder="Título"
-        value={titulo}
-        onChangeText={setTitulo}
-      />
-      <Button
-        title="Adicionar Tarefa"
-        onPress={handleAdicionarTarefaPress}
-        disabled={mutationAdicionar.isPending}
-      />
+      <View style={styles.inputRow}>
+        <TextInput
+          style={styles.input}
+          placeholder="Nova tarefa..."
+          placeholderTextColor="#888"
+          value={descricao}
+          onChangeText={setDescricao}
+        />
+        <TouchableOpacity
+          style={styles.btnAdd}
+          onPress={handleAdicionarTarefaPress}
+          disabled={mutation.isPending}
+        >
+          <Text style={styles.btnAddText}>+ Adicionar</Text>
+        </TouchableOpacity>
+      </View>
 
-      <View style={styles.hr} />
+      <View style={styles.divider} />
 
       <View style={styles.tasksContainer}>
         {data?.map((t) => (
-          <View key={t.objectId} style={styles.taskRow}>
-            <TouchableOpacity
-              style={styles.taskTextContainer}
-              onPress={() => router.push(`/tarefas/${t.objectId}`)}
-            >
-              <Text
-                style={[
-                  styles.taskText,
-                  t.concluida && styles.strikethroughText,
-                ]}
-              >
-                {t.titulo || t.descricao}
-              </Text>
-            </TouchableOpacity>
-
-            <Switch
-              value={t.concluida ?? false}
-              onValueChange={() => handleToggleConcluida(t)}
-              disabled={mutationAtualizar.isPending}
-            />
-          </View>
+          <Pressable
+            key={t.objectId}
+            style={styles.taskItem}
+            onPress={() => router.push(`/tarefas/${t.objectId}`)}
+          >
+            <View style={[styles.checkbox, t.concluida && styles.checkboxDone]}>
+              {t.concluida && <View style={styles.checkMark} />}
+            </View>
+            <Text style={[styles.taskText, t.concluida && styles.taskTextDone]}>
+              {t.descricao}
+            </Text>
+            <View style={styles.chevron} />
+          </Pressable>
         ))}
       </View>
     </View>
@@ -105,45 +88,91 @@ export default function TarefasPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    padding: 10,
+    padding: 16,
+    backgroundColor: "#fff",
+  },
+  inputRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 12,
   },
   input: {
-    borderColor: "black",
-    borderWidth: 1,
-    width: "90%",
-    marginBottom: 5,
-    paddingHorizontal: 8,
+    flex: 1,
+    height: 42,
+    borderWidth: 0.5,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    fontSize: 14,
+    backgroundColor: "#f9f9f9",
   },
-  hr: {
-    height: 1,
-    backgroundColor: "black",
-    width: "95%",
-    marginVertical: 10,
+  btnAdd: {
+    height: 42,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    backgroundColor: "#534AB7",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  btnAddText: {
+    color: "#EEEDFE",
+    fontSize: 13,
+    fontWeight: "500",
+  },
+  divider: {
+    height: 0.5,
+    backgroundColor: "#e0e0e0",
+    marginBottom: 12,
   },
   tasksContainer: {
-    width: "100%",
-    paddingHorizontal: 10,
     gap: 8,
   },
-  taskRow: {
+  taskItem: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    gap: 8,
+    gap: 10,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 0.5,
+    borderColor: "#e0e0e0",
+    backgroundColor: "#fff",
   },
-  taskTextContainer: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: "#ccc",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checkboxDone: {
+    backgroundColor: "#534AB7",
+    borderColor: "#534AB7",
+  },
+  checkMark: {
+    width: 5,
+    height: 9,
+    borderRightWidth: 2,
+    borderBottomWidth: 2,
+    borderColor: "#EEEDFE",
+    transform: [{ rotate: "45deg" }, { translateX: -1 }, { translateY: -1 }],
   },
   taskText: {
-    fontSize: 15,
+    flex: 1,
+    fontSize: 14,
+    color: "#1a1a1a",
   },
-  strikethroughText: {
+  taskTextDone: {
     textDecorationLine: "line-through",
-    textDecorationStyle: "solid",
-    textDecorationColor: "red",
-    color: "gray",
+    color: "#999",
+  },
+  chevron: {
+    width: 6,
+    height: 6,
+    borderRightWidth: 1.5,
+    borderTopWidth: 1.5,
+    borderColor: "#bbb",
+    transform: [{ rotate: "45deg" }],
   },
 });
