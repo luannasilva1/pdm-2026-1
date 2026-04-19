@@ -30,8 +30,8 @@ export default function TarefasPage() {
 
   async function handleAdicionarTarefaPress() {
     if (descricao.trim() === "") {
-      Alert.alert("Descrição inválida", "Preencha a descrição da tarefa", [
-        { text: "OK", onPress: () => {} },
+      Alert.alert("descrição inválida", "preencha a descrição da tarefa", [
+        { text: "ok", onPress: () => {} },
       ]);
       return;
     }
@@ -42,14 +42,19 @@ export default function TarefasPage() {
   return (
     <View style={styles.container}>
       {(isFetching || mutation.isPending) && (
-        <ActivityIndicator size="large" color="#534AB7" />
+        <ActivityIndicator size="large" color="#D96FA0" />
       )}
+
+      <View style={styles.titleRow}>
+        <Text style={styles.titleIcon}>✦</Text>
+        <Text style={styles.titleText}>minhas tarefas</Text>
+      </View>
 
       <View style={styles.inputRow}>
         <TextInput
           style={styles.input}
-          placeholder="Nova tarefa..."
-          placeholderTextColor="#888"
+          placeholder="nova tarefa..."
+          placeholderTextColor="#C991AE"
           value={descricao}
           onChangeText={setDescricao}
         />
@@ -58,7 +63,7 @@ export default function TarefasPage() {
           onPress={handleAdicionarTarefaPress}
           disabled={mutation.isPending}
         >
-          <Text style={styles.btnAddText}>+ Adicionar</Text>
+          <Text style={styles.btnAddText}>+ adicionar</Text>
         </TouchableOpacity>
       </View>
 
@@ -88,41 +93,60 @@ export default function TarefasPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "#fff",
+    padding: 20,
+    backgroundColor: "#FDF6F9",
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 20,
+  },
+  titleIcon: {
+    fontSize: 18,
+    color: "#D96FA0",
+  },
+  titleText: {
+    fontSize: 17,
+    fontWeight: "500",
+    color: "#7B2D5E",
+    letterSpacing: 0.3,
   },
   inputRow: {
     flexDirection: "row",
     gap: 8,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   input: {
     flex: 1,
     height: 42,
-    borderWidth: 0.5,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    fontSize: 14,
-    backgroundColor: "#f9f9f9",
+    borderWidth: 1,
+    borderColor: "#E8B4C8",
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    fontSize: 13,
+    backgroundColor: "#fff",
+    color: "#3D1F2E",
   },
   btnAdd: {
     height: 42,
-    paddingHorizontal: 14,
-    borderRadius: 10,
-    backgroundColor: "#534AB7",
+    paddingHorizontal: 18,
+    borderRadius: 20,
+    backgroundColor: "#D96FA0",
     justifyContent: "center",
     alignItems: "center",
   },
   btnAddText: {
-    color: "#EEEDFE",
+    color: "#fff",
     fontSize: 13,
     fontWeight: "500",
+    letterSpacing: 0.3,
   },
   divider: {
-    height: 0.5,
-    backgroundColor: "#e0e0e0",
-    marginBottom: 12,
+    height: 1,
+    backgroundColor: "#F2C9DA",
+    marginBottom: 16,
+    opacity: 0.8,
   },
   tasksContainer: {
     gap: 8,
@@ -130,49 +154,50 @@ const styles = StyleSheet.create({
   taskItem: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 12,
     padding: 12,
-    borderRadius: 12,
-    borderWidth: 0.5,
-    borderColor: "#e0e0e0",
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#F2C9DA",
     backgroundColor: "#fff",
   },
   checkbox: {
     width: 20,
     height: 20,
-    borderRadius: 6,
+    borderRadius: 10,
     borderWidth: 1.5,
-    borderColor: "#ccc",
+    borderColor: "#D4A0BD",
     justifyContent: "center",
     alignItems: "center",
   },
   checkboxDone: {
-    backgroundColor: "#534AB7",
-    borderColor: "#534AB7",
+    backgroundColor: "#D96FA0",
+    borderColor: "#D96FA0",
   },
   checkMark: {
     width: 5,
     height: 9,
     borderRightWidth: 2,
     borderBottomWidth: 2,
-    borderColor: "#EEEDFE",
+    borderColor: "#fff",
     transform: [{ rotate: "45deg" }, { translateX: -1 }, { translateY: -1 }],
   },
   taskText: {
     flex: 1,
-    fontSize: 14,
-    color: "#1a1a1a",
+    fontSize: 13.5,
+    color: "#3D1F2E",
   },
   taskTextDone: {
     textDecorationLine: "line-through",
-    color: "#999",
+    color: "#C4A0B4",
   },
   chevron: {
     width: 6,
     height: 6,
     borderRightWidth: 1.5,
     borderTopWidth: 1.5,
-    borderColor: "#bbb",
+    borderColor: "#D4A0BD",
     transform: [{ rotate: "45deg" }],
   },
 });

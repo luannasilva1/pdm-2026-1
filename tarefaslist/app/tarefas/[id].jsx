@@ -30,7 +30,7 @@ export default function TarefaDetalhesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tarefas"] });
       queryClient.invalidateQueries({ queryKey: ["tarefa", id] });
-      Alert.alert("Sucesso", "Tarefa atualizada com sucesso!");
+      Alert.alert("✦ sucesso", "tarefa atualizada!");
       router.back();
     },
   });
@@ -39,7 +39,7 @@ export default function TarefaDetalhesPage() {
     mutationFn: removerTarefa,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tarefas"] });
-      Alert.alert("Sucesso", "Tarefa removida com sucesso!");
+      Alert.alert("✦ pronto", "tarefa removida.");
       router.back();
     },
   });
@@ -56,7 +56,7 @@ export default function TarefaDetalhesPage() {
 
   function handleUpdate() {
     if (descricao.trim() === "") {
-      Alert.alert("Erro", "A descrição não pode estar vazia.");
+      Alert.alert("ops", "a descrição não pode estar vazia.");
       return;
     }
     updateMutation.mutate({ objectId: id, descricao, concluida });
@@ -64,12 +64,12 @@ export default function TarefaDetalhesPage() {
 
   function handleDelete() {
     Alert.alert(
-      "Confirmar exclusão",
-      "Tem certeza que deseja excluir esta tarefa?",
+      "excluir tarefa?",
+      "essa ação não pode ser desfeita.",
       [
-        { text: "Cancelar", style: "cancel" },
+        { text: "cancelar", style: "cancel" },
         {
-          text: "Excluir",
+          text: "excluir",
           style: "destructive",
           onPress: () => deleteMutation.mutate(id),
         },
@@ -80,7 +80,7 @@ export default function TarefaDetalhesPage() {
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#534AB7" />
+        <ActivityIndicator size="large" color="#D96FA0" />
       </View>
     );
   }
@@ -89,7 +89,9 @@ export default function TarefaDetalhesPage() {
     <>
       <Stack.Screen
         options={{
-          title: `Tarefa #${id}`,
+          title: `✦ tarefa #${id}`,
+          headerTintColor: "#7B2D5E",
+          headerStyle: { backgroundColor: "#FDF6F9" },
           headerRight: () => (
             <View
               style={[
@@ -111,22 +113,23 @@ export default function TarefaDetalhesPage() {
       />
       <View style={[styles.container, { paddingBottom: insets.bottom + 20 }]}>
         <View style={styles.field}>
-          <Text style={styles.fieldLabel}>Descrição</Text>
+          <Text style={styles.fieldLabel}>descrição</Text>
           <TextInput
             style={styles.input}
             value={descricao}
             onChangeText={setDescricao}
             multiline
+            placeholderTextColor="#C991AE"
           />
         </View>
 
         <View style={styles.toggleRow}>
-          <Text style={styles.toggleLabel}>Concluída</Text>
+          <Text style={styles.toggleLabel}>concluída</Text>
           <Switch
             value={concluida}
             onValueChange={setConcluida}
-            trackColor={{ false: "#e0e0e0", true: "#AFA9EC" }}
-            thumbColor={concluida ? "#534AB7" : "#fff"}
+            trackColor={{ false: "#F2C9DA", true: "#E8A0C0" }}
+            thumbColor={concluida ? "#D96FA0" : "#fff"}
           />
         </View>
 
@@ -137,7 +140,7 @@ export default function TarefaDetalhesPage() {
             disabled={updateMutation.isPending}
           >
             <Text style={styles.btnSaveText}>
-              {updateMutation.isPending ? "Salvando..." : "Salvar alterações"}
+              {updateMutation.isPending ? "salvando..." : "salvar alterações"}
             </Text>
           </TouchableOpacity>
 
@@ -147,7 +150,7 @@ export default function TarefaDetalhesPage() {
             disabled={deleteMutation.isPending}
           >
             <Text style={styles.btnDeleteText}>
-              {deleteMutation.isPending ? "Excluindo..." : "Excluir tarefa"}
+              {deleteMutation.isPending ? "excluindo..." : "excluir tarefa"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -160,69 +163,76 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#FDF6F9",
     gap: 16,
   },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#FDF6F9",
   },
   badge: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 20,
     marginRight: 4,
   },
   badgePending: {
-    backgroundColor: "#FAEEDA",
+    backgroundColor: "#FDE8F3",
+    borderWidth: 1,
+    borderColor: "#F2C9DA",
   },
   badgeDone: {
-    backgroundColor: "#EAF3DE",
+    backgroundColor: "#EDE8FD",
+    borderWidth: 1,
+    borderColor: "#C9BAF2",
   },
   badgeText: {
     fontSize: 12,
     fontWeight: "500",
+    letterSpacing: 0.3,
   },
   badgeTextPending: {
-    color: "#854F0B",
+    color: "#B04280",
   },
   badgeTextDone: {
-    color: "#3B6D11",
+    color: "#6B3FB0",
   },
   field: {
     gap: 6,
   },
   fieldLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "500",
-    color: "#888",
-    letterSpacing: 0.4,
+    color: "#C991AE",
+    letterSpacing: 1,
     textTransform: "uppercase",
   },
   input: {
-    borderWidth: 0.5,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    padding: 12,
+    borderWidth: 1,
+    borderColor: "#E8B4C8",
+    borderRadius: 16,
+    padding: 14,
     fontSize: 15,
-    backgroundColor: "#f9f9f9",
-    minHeight: 72,
+    backgroundColor: "#fff",
+    minHeight: 80,
     textAlignVertical: "top",
+    color: "#3D1F2E",
   },
   toggleRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     padding: 14,
-    borderRadius: 12,
-    borderWidth: 0.5,
-    borderColor: "#e0e0e0",
-    backgroundColor: "#f9f9f9",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#F2C9DA",
+    backgroundColor: "#fff",
   },
   toggleLabel: {
     fontSize: 15,
-    color: "#1a1a1a",
+    color: "#3D1F2E",
   },
   actions: {
     marginTop: "auto",
@@ -230,28 +240,30 @@ const styles = StyleSheet.create({
   },
   btnSave: {
     height: 48,
-    borderRadius: 12,
-    backgroundColor: "#534AB7",
+    borderRadius: 20,
+    backgroundColor: "#D96FA0",
     justifyContent: "center",
     alignItems: "center",
   },
   btnSaveText: {
-    color: "#EEEDFE",
+    color: "#fff",
     fontSize: 15,
     fontWeight: "500",
+    letterSpacing: 0.3,
   },
   btnDelete: {
     height: 48,
-    borderRadius: 12,
-    backgroundColor: "#FCEBEB",
-    borderWidth: 0.5,
-    borderColor: "#F09595",
+    borderRadius: 20,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#F2C9DA",
     justifyContent: "center",
     alignItems: "center",
   },
   btnDeleteText: {
-    color: "#A32D2D",
+    color: "#C45C7A",
     fontSize: 15,
     fontWeight: "500",
+    letterSpacing: 0.3,
   },
 });
