@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "tarefaslist",
+    "owner": "atividades-pdm-20261",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
